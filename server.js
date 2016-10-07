@@ -9,7 +9,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var app_port = process.env.app_port || 8080;
+var app_port = process.env.app_port || 12345;
 var app_host = process.env.app_host || '127.0.0.1';
 
 console.log( "Server on", app_host, ":", app_port);
