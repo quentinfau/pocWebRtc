@@ -11,7 +11,6 @@ var io = require('socket.io')(http);
 
 app.set('port', (process.env.PORT || 5000));
 
-console.log( "Server on", app_host, ":", app_port);
 
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
