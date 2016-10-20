@@ -13,8 +13,8 @@ var express = require('express');
 var bodyParser = require('body-parser')
 var main = express()
 var http = require('http').Server(app);
-var server = http.createServer(main)
-var io  = require('socket.io').listen(server);
+//var server = http.createServer(main)
+var io  = require('socket.io')(http);
 //io.set('log level', 2);
 main.set('port', (process.env.PORT || 5000));
 
