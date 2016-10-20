@@ -8,16 +8,22 @@ var PORT = 5000;
 /*** SETUP ***/
 /*************/
 var express = require('express');
-var http = require('http');
+//var http = require('http');
+
 var bodyParser = require('body-parser')
 var main = express()
+var http = require('http').Server(app);
 var server = http.createServer(main)
 var io  = require('socket.io').listen(server);
 //io.set('log level', 2);
 main.set('port', (process.env.PORT || 5000));
-server.listen(PORT, null, function() {
-    console.log("Listening on port " + PORT);
+
+http.listen(main.get('port'), function () {
+    console.log('Node app is running on port', main.get('port'));
 });
+/*server.listen(PORT, null, function() {
+    console.log("Listening on port " + PORT);
+});*/
 //main.use(express.bodyParser());
 
 main.get('/', function(req, res){ res.sendFile(__dirname + '/client.html'); });
