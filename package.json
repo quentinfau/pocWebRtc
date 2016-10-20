@@ -1,9 +1,13 @@
 {
-  "name": "socket-chat-example",
-  "version": "0.0.1",
-  "description": "my first socket.io app",
+  "name": "",
+  "version": "",
+  "description": "About =====",
+  "scripts": {
+    "start": "node signaling-server"
+  },
   "dependencies": {
-    "express": "^4.10.2",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
     "socket.io": "^1.4.8"
   }
 }
