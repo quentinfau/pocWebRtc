@@ -14,7 +14,7 @@ var main = express()
 var server = http.createServer(main)
 var io  = require('socket.io').listen(server);
 //io.set('log level', 2);
-
+main.set('port', (process.env.PORT || 5000));
 server.listen(PORT, null, function() {
     console.log("Listening on port " + PORT);
 });
