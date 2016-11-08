@@ -43,6 +43,12 @@ wss.on('connection', function(ws){
 
 var express = require('express'),
     app = express();
-
+var http = require('http').Server(app);
+//var server = http.createServer(main)
+var io  = require('socket.io')(http);
+//io.set('log level', 2);
+app.set('port', (process.env.PORT || 5000));
 app.get('/', function(req, res){ res.sendFile(__dirname + '/index.html'); });
-app.listen(8888);
+http.listen(app.get('port'), function () {
+	console.log('Node app is running on port', app.get('port'));
+});
