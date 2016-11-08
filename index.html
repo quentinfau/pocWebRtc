@@ -1,0 +1,211 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>miniWebRTC</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<h3>Create or join a room?</h3>
+<form method="GET" action="http://localhost:8888/">
+    <input type="text" name="user" id="user" placeholder="e.g. Alice">
+    <button type="submit" id="setid">Connect to WebSocket</button>
+</form>
+<input type="text" id="user2" placeholder="e.g. Bob">
+<button id="connectToRemote">Connect to remote</button>
+<br>
+Chat:
+<br>
+<div id="chatlog" style="height:200px; overflow:auto; border:1px solid"></div>
+<br>
+<input type="text" id="messageTextBox" placeholder="Type your message here">
+<button id="sendMessageBtn" onclick="sendMessage()">Send message</button>
+<script>
+
+var ws = null;
+var user = null;
+var user2 = null;
+
+function connectToWebSocket() {
+    ws = new WebSocket("ws://127.0.0.1:8088");
+    ws.onopen = function(e){
+        console.log("Websocket opened");
+        var msg = {
+            type: "username",
+            data: user,
+            test:e
+        };
+        ws.send(JSON.stringify(msg));
+    }
+    ws.onclose = function(e){
+        console.log("Websocket closed");
+    }
+
+    ws.onmessage = function(e){
+        console.log("Websocket message received: " + e.data);
+        var json = JSON.parse(e.data);
+
+        if(json.action == "candidate"){
+            if(json.to == user){
+                processIce(json.data);
+            }
+        } else if(json.action == "offer"){
+            // incoming offer
+          //  if(json.to == user){
+                user2 = json.from;
+                processOffer(json.data)
+           // }
+        } else if(json.action == "answer"){
+            // incoming answer
+            if(json.to == user){
+                processAnswer(json.data);
+            }
+        }
+        // else if(json.action == "id"){
+        //    userId = json.data;
+        // } else if(json.action=="newUser"){
+        //     if(userId!=null && json.data!=userId){
+
+        //     }
+        // }
+
+    }
+    ws.onerror = function(e){
+        console.log("Websocket error");
+    }
+}
+
+
+// BOB: create
+function connectTo() {
+  dc1 = pc1.createDataChannel('test', {reliable: true})
+  activedc = dc1
+  dc1.onopen = function(e) { }
+  dc1.onmessage = function(e) {
+
+      if (e.data.charCodeAt(0) == 2) {
+        return
+      }
+      var data = JSON.parse(e.data);
+      writeMsg(data);
+  }
+  pc1.createOffer(function(desc) {
+    pc1.setLocalDescription(desc, function() {}, function() {})
+      console.log("------ SEND OFFER ------");
+      sendNegotiation("offer", desc);
+  }, function() { }, sdpConstraints)
+};
+
+// BOB: pasted Alice's answer
+function processAnswer(answer){
+    var answerDesc = new RTCSessionDescription(answer);
+    pc1.setRemoteDescription(answerDesc);
+    console.log("------ PROCESSED ANSWER ------");
+    return true;
+};
+
+setid.onclick = function () {
+    user = $("#user").val();
+    connectToWebSocket();
+    return false;
+};
+connectToRemote.onclick = function () {
+    user2 = $("#user2").val();
+    connectTo();
+}
+
+// ALICE: pasted Bob's answer
+function processOffer(offer){
+    var offerDesc = new RTCSessionDescription(offer);
+    var sdpConstraints = {'mandatory':
+    {
+        'OfferToReceiveAudio': false,
+        'OfferToReceiveVideo': false
+    }
+    };
+    pc2.setRemoteDescription(offerDesc);
+    pc2.createAnswer(function(answerDesc) {
+                pc2.setLocalDescription(answerDesc);
+                console.log("------ SEND ANSWER ------");
+                sendNegotiation("answer", answerDesc);
+
+            },
+            function () { },
+            sdpConstraints)
+}
+
+if (navigator.webkitGetUserMedia) {
+  RTCPeerConnection = webkitRTCPeerConnection
+}
+
+var cfg = {'iceServers': [{'url': "stun:stun.gmx.net"}]},
+con = { 'optional': [{'DtlsSrtpKeyAgreement': true}] }
+
+var pc1 = new RTCPeerConnection(cfg, con), dc1 = null, tn1 = null, activedc, pc1icedone = false;
+
+var sdpConstraints = {
+  optional: [],
+}
+
+function sendMessage () {
+  if (messageTextBox.value) {
+    activedc.send(JSON.stringify({message: messageTextBox.value, user: user}));
+    chatlog.innerHTML += '[' + user + '] ' + messageTextBox.value + '</p>';
+    messageTextBox.value = "";
+  }
+  return false
+}
+
+function sendNegotiation(type, sdp){
+    var json = { from: user, to: user2, action: type, data: sdp};
+    ws.send(JSON.stringify(json));
+    console.log("Sending ["+user+"] to ["+user2+"]: " + JSON.stringify(sdp));
+}
+
+
+pc1.onicecandidate = function (e) {
+  if (e.candidate != null) {
+      sendNegotiation("candidate", e.candidate);
+  }
+  else {
+      console.log("CONNECTED");
+      var data = { user: "system", message: "user '"+user+"' connected"};
+      writeMsg(data);
+      activedc.send(JSON.stringify(data));
+  }
+}/*
+pc1.onicecandidate = e => !e.candidate
+|| sendNegotiation("candidate", e.candidate);
+*/
+var pc2 = new RTCPeerConnection(cfg, con), dc2 = null, pc2icedone = false;
+
+pc2.ondatachannel = function (e) {
+  var datachannel = e.channel || e;
+  dc2 = datachannel;
+  activedc = dc2;
+  dc2.onopen = function (e) { };
+  dc2.onmessage = function (e) {
+      var data = JSON.parse(e.data);
+     writeMsg(data);
+    }
+  };
+function writeMsg(data) {
+    chatlog.innerHTML += '[' + data.user + '] ' + data.message + '</p>';
+    chatlog.scrollTop = chatlog.scrollHeight;
+}
+pc2.onicecandidate = function (e) {
+  if (e.candidate != null) {
+      sendNegotiation("candidate", e.candidate);
+  }
+  else {
+      console.log("CONNECTED");
+      //on écrit dans le chat que le user s'est connecté
+      var data = { user: "system", message: "user '"+user+"' connected"};
+      writeMsg(data);
+      //on envoie dans le channel que le user s'est connecté
+      activedc.send(JSON.stringify(data));
+  }
+}/*
+pc2.onicecandidate = e => !e.candidate
+|| sendNegotiation("candidate", e.candidate)
+*/
+function processIce(iceCandidate){
+    pc1.addIceCandidate(new RTCIceCandidate(iceCandidate));
+}
+</script>
