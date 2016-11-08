@@ -1,6 +1,6 @@
 var WebSocket = require("ws");
 var WebSocketServer = require('ws').Server;
-var wss = new WebSocketServer({port: 8088});
+var wss = new WebSocketServer({port: 5001});
 var username;
 var wsList = [];
 wss.on('connection', function(ws){

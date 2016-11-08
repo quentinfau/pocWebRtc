@@ -3,7 +3,7 @@
 <title>miniWebRTC</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <h3>Create or join a room?</h3>
-<form method="GET" action="http://localhost:8888/">
+<form method="GET" action="">
     <input type="text" name="user" id="user" placeholder="e.g. Alice">
     <button type="submit" id="setid">Connect to WebSocket</button>
 </form>
@@ -23,7 +23,7 @@ var user = null;
 var user2 = null;
 
 function connectToWebSocket() {
-    ws = new WebSocket("ws://pocwebrtc.herokuapp.com:8088");
+    ws = new WebSocket("ws://pocwebrtc.herokuapp.com:5001");
     ws.onopen = function(e){
         console.log("Websocket opened");
         var msg = {
