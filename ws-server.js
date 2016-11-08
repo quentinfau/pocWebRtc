@@ -1,20 +1,34 @@
-
+/*
 var express = require('express'),
-	app = express();
+const server = express()
+		.use((req, res) => res.sendFile('/index.html') )
+.listen(PORT, () => console.log(`Listening on ${ PORT }`));
 var http = require('http').Server(app);
 //var server = http.createServer(main)
 var io  = require('socket.io')(http);
 //io.set('log level', 2);
-app.set('port', (process.env.PORT || 5000));
-app.get('/', function(req, res){ res.sendFile(__dirname + '/index.html'); });
-http.listen(app.get('port'), function () {
-	console.log('Node app is running on port', app.get('port'));
+server.set('port', (process.env.PORT || 5000));
+server.get('/', function(req, res){ res.sendFile(__dirname + '/index.html'); });
+http.listen(server.get('port'), function () {
+	console.log('Node app is running on port', server.get('port'));
 });
+*/
+const express = require('express');
+const SocketServer = require('ws').Server;
+const path = require('path');
 
+const PORT = process.env.PORT || 3000;
+const INDEX = path.join(__dirname, 'index.html');
 
+const server = express()
+		.use((req, res) => res.sendFile(INDEX) )
+.listen(PORT, () => console.log(`Listening on ${ PORT }`));
+
+const wss = new SocketServer({ server });
+/*
 var WebSocket = require("ws");
 var WebSocketServer = require('ws').Server;
-var wss = new WebSocketServer({app});
+var wss = new WebSocketServer({app});*/
 var username;
 var wsList = [];
 wss.on('connection', function(ws){
