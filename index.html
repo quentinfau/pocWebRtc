@@ -23,7 +23,7 @@ var user = null;
 var user2 = null;
 
 function connectToWebSocket() {
-    ws = new WebSocket("ws://127.0.0.1:8088");
+    ws = new WebSocket("ws://pocwebrtc.herokuapp.com:8088");
     ws.onopen = function(e){
         console.log("Websocket opened");
         var msg = {
