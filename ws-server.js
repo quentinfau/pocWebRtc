@@ -1,6 +1,20 @@
+
+var express = require('express'),
+	app = express();
+var http = require('http').Server(app);
+//var server = http.createServer(main)
+var io  = require('socket.io')(http);
+//io.set('log level', 2);
+app.set('port', (process.env.PORT || 5000));
+app.get('/', function(req, res){ res.sendFile(__dirname + '/index.html'); });
+http.listen(app.get('port'), function () {
+	console.log('Node app is running on port', app.get('port'));
+});
+
+
 var WebSocket = require("ws");
 var WebSocketServer = require('ws').Server;
-var wss = new WebSocketServer({port: 5001});
+var wss = new WebSocketServer({app});
 var username;
 var wsList = [];
 wss.on('connection', function(ws){
@@ -41,14 +55,3 @@ wss.on('connection', function(ws){
 	});
 });
 
-var express = require('express'),
-    app = express();
-var http = require('http').Server(app);
-//var server = http.createServer(main)
-var io  = require('socket.io')(http);
-//io.set('log level', 2);
-app.set('port', (process.env.PORT || 5000));
-app.get('/', function(req, res){ res.sendFile(__dirname + '/index.html'); });
-http.listen(app.get('port'), function () {
-	console.log('Node app is running on port', app.get('port'));
-});
