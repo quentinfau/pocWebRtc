@@ -100,7 +100,6 @@ Chat:
 
     // BOB: create
     function connectTo() {
-        var pc1 = new RTCPeerConnection(cfg, con), dc1 = null, tn1 = null, activedc, pc1icedone = false;
         dc1 = pc1.createDataChannel('test', {reliable: true})
         activedc = dc1
         dc1.onopen = function (e) {
@@ -182,6 +181,7 @@ Chat:
         console.log("Sending [" + user + "] to [" + user2 + "]: " + JSON.stringify(sdp));
     }
 
+    var pc1 = new RTCPeerConnection(cfg, con), dc1 = null, tn1 = null, activedc, pc1icedone = false;
 
     pc1.onicecandidate = function (e) {
         if (e.candidate != null) {
