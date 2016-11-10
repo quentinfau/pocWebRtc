@@ -96,7 +96,7 @@ Chat:
         }
     }
 
-    var pc1 = new RTCPeerConnection(cfg, con), dc1 = null, tn1 = null, activedc, pc1icedone = false;
+
     // BOB: create
     function connectTo() {
         dc1 = pc1.createDataChannel('test', {reliable: true})
@@ -163,6 +163,7 @@ Chat:
         RTCPeerConnection = webkitRTCPeerConnection
     }
 
+    var pc1 = new RTCPeerConnection(cfg, con), dc1 = null, tn1 = null, activedc, pc1icedone = false;
 
     function sendMessage() {
         if (messageTextBox.value) {
