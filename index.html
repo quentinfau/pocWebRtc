@@ -184,7 +184,7 @@ Chat:
     var pc1 = new RTCPeerConnection(cfg, con), dc1 = null, tn1 = null, activedc, pc1icedone = false;
 
     pc1.onicecandidate = function (e) {
-        if (e.candidate == null) {
+        if (e.candidate != null) {
             sendNegotiation("candidate", e.candidate);
         }
         else {
@@ -216,7 +216,7 @@ Chat:
         chatlog.scrollTop = chatlog.scrollHeight;
     }
     pc2.onicecandidate = function (e) {
-        if (e.candidate == null) {
+        if (e.candidate != null) {
             sendNegotiation("candidate", e.candidate);
         }
         else {
