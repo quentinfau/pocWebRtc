@@ -22,7 +22,7 @@ Chat:
 
 
 
-    var cfg = {
+ /*   var cfg = {
                 'iceServers': [
                     {
                         'url': 'stun:stun.l.google.com:19302'
@@ -38,7 +38,8 @@ Chat:
                         'username': '28224511:1379330808'
                     }
                 ]
-            },
+            },*/
+    var cfg = {'iceServers': [{'url': "stun:stun.l.google.com:19302"}]},
             con = {'optional': [{'DtlsSrtpKeyAgreement': true}]};
 
     var sdpConstraints = {
@@ -99,6 +100,7 @@ Chat:
 
     // BOB: create
     function connectTo() {
+        var pc1 = new RTCPeerConnection(cfg, con), dc1 = null, tn1 = null, activedc, pc1icedone = false;
         dc1 = pc1.createDataChannel('test', {reliable: true})
         activedc = dc1
         dc1.onopen = function (e) {
@@ -163,7 +165,7 @@ Chat:
         RTCPeerConnection = webkitRTCPeerConnection
     }
 
-    var pc1 = new RTCPeerConnection(cfg, con), dc1 = null, tn1 = null, activedc, pc1icedone = false;
+
 
     function sendMessage() {
         if (messageTextBox.value) {
