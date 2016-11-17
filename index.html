@@ -160,7 +160,10 @@ Chat:
         dc1 = pc1.createDataChannel('test', {reliable: true})
         activedc = dc1
         dc1.onopen = function (e) {
-            console.log('TEST');
+            console.log('Connected');
+            var data = {user: "system", message: "user '" + user + "' connected"};
+            writeMsg(data);
+            activedc.send(JSON.stringify(data));
         }
         dc1.onmessage = function (e) {
 
@@ -266,7 +269,12 @@ Chat:
         dc2 = datachannel;
         activedc = dc2;
         dc2.onopen = function (e) {
-            console.log('TEST');
+            console.log('Connected');
+            //on écrit dans le chat que le user s'est connecté
+            var data = {user: "system", message: "user '" + user + "' connected"};
+            writeMsg(data);
+            //on envoie dans le channel que le user s'est connecté
+            activedc.send(JSON.stringify(data));
         };
         dc2.onmessage = function (e) {
             var data = JSON.parse(e.data);
