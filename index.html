@@ -14,11 +14,14 @@ Chat:
 <br>
 <input type="text" id="messageTextBox" placeholder="Type your message here">
 <button id="sendMessageBtn" onclick="sendMessage()">Send message</button>
+<script src="/socket.io/socket.io.js"></script>
 <script>
 
     var ws = null;
     var user = null;
     var user2 = null;
+    var socket = null;
+    socket = io.connect('http://localhost:3000');
 
 
 
@@ -46,55 +49,110 @@ Chat:
         optional: [],
     }
 
-    function connectToWebSocket() {
-        var HOST = location.origin.replace(/^http/, 'ws')
-        ws = new WebSocket(HOST);
-        // ws = new WebSocket("ws://pocwebrtc.herokuapp.com:5001");
-        ws.onopen = function (e) {
-            console.log("Websocket opened");
-            var msg = {
-                type: "username",
-                data: user,
-                test: e
-            };
-            ws.send(JSON.stringify(msg));
-        }
-        ws.onclose = function (e) {
-            console.log("Websocket closed");
-        }
+    socket.on('simplemessage', function (message) {
+        console.log("received message from the server : " + message);
+    });
+    socket.on('message', function (data) {
+        console.log("received message from the server : " + data);
+        var json = JSON.parse(data);
 
-        ws.onmessage = function (e) {
-            console.log("Websocket message received: " + e.data);
-            var json = JSON.parse(e.data);
-
-            if (json.action == "candidate") {
-                if (json.to == user) {
-                    processIce(json.data);
-                }
-            } else if (json.action == "offer") {
-                // incoming offer
-                //  if(json.to == user){
-                user2 = json.from;
-                processOffer(json.data)
-                // }
-            } else if (json.action == "answer") {
-                // incoming answer
-                if (json.to == user) {
-                    processAnswer(json.data);
-                }
+        if (json.action == "candidate") {
+            if (json.to == user) {
+                processIce(json.data);
             }
-            // else if(json.action == "id"){
-            //    userId = json.data;
-            // } else if(json.action=="newUser"){
-            //     if(userId!=null && json.data!=userId){
-
-            //     }
+        } else if (json.action == "offer") {
+            // incoming offer
+            //  if(json.to == user){
+            user2 = json.from;
+            processOffer(json.data)
             // }
+        } else if (json.action == "answer") {
+            // incoming answer
+            if (json.to == user) {
+                processAnswer(json.data);
+            }
+        }
+        // else if(json.action == "id"){
+        //    userId = json.data;
+        // } else if(json.action=="newUser"){
+        //     if(userId!=null && json.data!=userId){
+        //     }
+        // }
+    });
 
-        }
-        ws.onerror = function (e) {
-            console.log("Websocket error");
-        }
+    function connectToWebSocket() {
+
+
+
+        socket.emit('nouveau_client', user);
+
+ /*       $('#send').click(function () {
+            var messageInputBox = document.getElementById('message');
+            var myObject = {
+                message: messageInputBox.value,
+                pseudo: pseudo
+            };
+            socket.emit('message', myObject);
+        });
+*/
+
+/*
+        socket.on('nouveau_client', function (pseudo) {
+            var el = document.createElement("p");
+            var txtNode = document.createTextNode(pseudo + ' vient de se connecter');
+            el.appendChild(txtNode);
+            receivebox.appendChild(el);
+        });
+*/
+
+        /*    var HOST = location.origin.replace(/^http/, 'ws')
+            ws = new WebSocket(HOST);
+            // ws = new WebSocket("ws://pocwebrtc.herokuapp.com:5001");
+            ws.onopen = function (e) {
+                console.log("Websocket opened");
+                var msg = {
+                    type: "username",
+                    data: user,
+                    test: e
+                };
+                ws.send(JSON.stringify(msg));
+            }
+            ws.onclose = function (e) {
+                console.log("Websocket closed");
+            }
+
+            ws.onmessage = function (e) {
+                console.log("Websocket message received: " + e.data);
+                var json = JSON.parse(e.data);
+
+                if (json.action == "candidate") {
+                    if (json.to == user) {
+                        processIce(json.data);
+                    }
+                } else if (json.action == "offer") {
+                    // incoming offer
+                    //  if(json.to == user){
+                    user2 = json.from;
+                    processOffer(json.data)
+                    // }
+                } else if (json.action == "answer") {
+                    // incoming answer
+                    if (json.to == user) {
+                        processAnswer(json.data);
+                    }
+                }
+                // else if(json.action == "id"){
+                //    userId = json.data;
+                // } else if(json.action=="newUser"){
+                //     if(userId!=null && json.data!=userId){
+
+                //     }
+                // }
+
+            }
+            ws.onerror = function (e) {
+                console.log("Websocket error");
+            }*/
     }
 
 
@@ -113,9 +171,9 @@ Chat:
             writeMsg(data);
         }
         pc1.createOffer(function (desc) {
-            pc1.setLocalDescription(desc, function () {}, function () {})
+            pc1.setLocalDescription(desc, function () {}, function () {});
             console.log("------ SEND OFFER ------");
-            sendNegotiation("offer", desc);
+
         }, function () {}, sdpConstraints)
     }
     ;
@@ -152,8 +210,6 @@ Chat:
         pc2.createAnswer(function (answerDesc) {
                     pc2.setLocalDescription(answerDesc);
                     console.log("------ SEND ANSWER ------");
-                    sendNegotiation("answer", answerDesc);
-
                 },
                 function () {
                 },
@@ -177,21 +233,26 @@ Chat:
 
     function sendNegotiation(type, sdp) {
         var json = {from: user, to: user2, action: type, data: sdp};
-        ws.send(JSON.stringify(json));
+     //   ws.send(JSON.stringify(json));
         console.log("Sending [" + user + "] to [" + user2 + "]: " + JSON.stringify(sdp));
+        socket.emit('message', JSON.stringify(json));
+
+
     }
 
     var pc1 = new RTCPeerConnection(cfg, con), dc1 = null, tn1 = null, activedc, pc1icedone = false;
 
     pc1.onicecandidate = function (e) {
         if (e.candidate != null) {
-            sendNegotiation("candidate", e.candidate);
+           // sendNegotiation("candidate", e.candidate);
+            sendNegotiation("offer", pc1.localDescription);
         }
         else {
-            console.log("CONNECTED");
+       /*     console.log("CONNECTED");
             var data = {user: "system", message: "user '" + user + "' connected"};
             writeMsg(data);
             activedc.send(JSON.stringify(data));
+            */
         }
     }
     /*
@@ -217,15 +278,17 @@ Chat:
     }
     pc2.onicecandidate = function (e) {
         if (e.candidate != null) {
-            sendNegotiation("candidate", e.candidate);
+            sendNegotiation("answer", pc2.localDescription);
+          //  sendNegotiation("candidate", e.candidate);
         }
-        else {
+        else {/*
             console.log("CONNECTED");
             //on écrit dans le chat que le user s'est connecté
             var data = {user: "system", message: "user '" + user + "' connected"};
             writeMsg(data);
             //on envoie dans le channel que le user s'est connecté
             activedc.send(JSON.stringify(data));
+            */
         }
     }
     /*

@@ -24,11 +24,12 @@ const server = express()
 		.use((req, res) => res.sendFile(INDEX) )
 .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
-const wss = new SocketServer({ server });
-/*
+/*const wss = new SocketServer({ server });
+
 var WebSocket = require("ws");
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({app});*/
+/*
 var username;
 var wsList = [];
 wss.on('connection', function(ws){
@@ -68,4 +69,47 @@ wss.on('connection', function(ws){
 		}
 	});
 });
+*/
 
+var io = require('socket.io').listen(server);
+var socketList = [];
+
+// Quand un client se connecte, on le note dans la console
+
+io.sockets.on('connection', function (socket) {
+	console.log('Un client est connecté !');
+	socketList.push(socket);
+	socket.emit('simplemessage', 'Vous êtes bien connecté !');
+
+	socket.on('nouveau_client', function(pseudo) {
+		console.log('nouveau client');
+		socket.user = pseudo;
+		socket.broadcast.emit('nouveau_client', pseudo);
+	});
+
+	socket.on('message', function (data) {
+		console.log('Got socket message: '+data);
+		var msg = JSON.parse(data);
+		switch(msg.type) {
+			case "username":
+				console.log('Got socket username message: ');
+				socket.user=msg.data;
+				break;
+			default:
+				console.log('Got socket default message: ');
+				for (var i = 0; i < socketList.length; i++) {
+					// send to everybody on the site
+					if (socketList[i].user == msg.to) {
+						socketList[i].emit('message', data);
+						return;
+					}
+				}
+		}
+	});
+
+	socket.on('disconnect', function (e) {
+		//wsList.splice(wsList.indexOf(ws),1);
+		socketList.splice(socketList.indexOf(this),1);
+		console.log('Client disconnected')
+	});
+});
