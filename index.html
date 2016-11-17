@@ -22,11 +22,7 @@ Chat:
     var user2 = null;
     var socket = null;
 
-    socket = io.connect('http://pocwebrtc.herokuapp.com');
-
-    var HOST = location.origin.replace(/^http/, 'ws')
-    ws = new WebSocket(HOST);
-    // ws = new WebSocket("ws://pocwebrtc.herokuapp.com:5001");
+    socket = io.connect(location.origin);
 
  /*   var cfg = {
                 'iceServers': [
