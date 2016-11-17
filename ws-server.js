@@ -75,7 +75,7 @@ var io = require('socket.io').listen(server);
 var socketList = [];
 
 // Quand un client se connecte, on le note dans la console
-
+console.log('init');
 io.sockets.on('connection', function (socket) {
 	console.log('Un client est connecté !');
 	socketList.push(socket);
