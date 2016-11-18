@@ -179,13 +179,13 @@ Chat:
         }
 
 
-        dc1 = pcLocal.createDataChannel('test', {reliable: true})
+        dc1 = pcLocal.createDataChannel(createID(user,user2), {reliable: true})
         activedc = dc1
         dc1.onopen = function (e) {
             console.log('Connected');
-            var data = {user: "system", message: "user '" + user + "' connected"};
+            var data = {user: "system", message: "the datachannel "+dc1.label+" has been opened"};
             writeMsg(data);
-            activedc.send(JSON.stringify(data));
+      //      activedc.send(JSON.stringify(data));
         }
         dc1.onmessage = function (e) {
 
@@ -250,10 +250,10 @@ Chat:
             dc2.onopen = function (e) {
                 console.log('Connected');
                 //on écrit dans le chat que le user s'est connecté
-                var data = {user: "system", message: "user '" + user + "' connected"};
+                var data = {user: "system", message: "the datachannel "+dc2.label+" has been opened"};
                 writeMsg(data);
                 //on envoie dans le channel que le user s'est connecté
-                activedc.send(JSON.stringify(data));
+           //     activedc.send(JSON.stringify(data));
                 socket.emit("askForId", user2);
             };
             dc2.onmessage = function (e) {
