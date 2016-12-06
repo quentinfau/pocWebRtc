@@ -65,6 +65,7 @@ Chat:
 
         socket.on('welcomeMessage', function (message) {
             console.log("received message from the server : " + message);
+            writeMsg(message);
         });
         socket.on('askForId', function (id) {
             pcLocalList[createID(user,user2)] = pcLocal;
