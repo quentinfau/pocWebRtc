@@ -263,7 +263,7 @@ Chat:
         };
 
         pcRemote.onicecandidate = function (e) {
-            if (pcLocal.iceGatheringState == "complete") {
+            if (pcRemote.iceGatheringState == "complete") {
                 sendNegotiation("answer", pcRemote.localDescription);
                 //  sendNegotiation("candidate", e.candidate);
             }
