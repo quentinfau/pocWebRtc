@@ -167,6 +167,9 @@ Chat:
        //pcLocal = new RTCPeerConnection(cfg, con);
 
         pcLocal.onicecandidate = function (e) {
+            if (e.candidate) {
+                pcLocal.addIceCandidate(new RTCIceCandidate(e.candidate));
+            }
             if (pcLocal.iceGatheringState == "complete") {
                 sendNegotiation("offer", pcLocal.localDescription);
             }
@@ -264,6 +267,9 @@ Chat:
         };
 
         pcRemote.onicecandidate = function (e) {
+            if (e.candidate) {
+                pcRemote.addIceCandidate(new RTCIceCandidate(e.candidate));
+            }
             if (pcRemote.iceGatheringState == "complete") {
                 sendNegotiation("answer", pcRemote.localDescription);
                 //  sendNegotiation("candidate", e.candidate);
