@@ -19,8 +19,8 @@ io.sockets.on('connection', function (socket) {
 	console.log('Un client est connecté !');
 	socketList.push(socket);
 	var welcomeMessage = {
-		message 'Vous êtes bien connecté !',
-		user = socket.user;
+		'message' : 'Vous êtes bien connecté !',
+		'user' : socket.user;
 	}
 	socket.emit('welcomeMessage', welcomeMessage);
 
