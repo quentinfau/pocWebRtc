@@ -20,7 +20,7 @@ io.sockets.on('connection', function (socket) {
 	socketList.push(socket);
 	var welcomeMessage = {
 		'message' : 'Vous êtes bien connecté !',
-		'user' : socket.user;
+		'user' : socket.user
 	}
 	socket.emit('welcomeMessage', welcomeMessage);
 
