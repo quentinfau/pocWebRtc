@@ -16,7 +16,7 @@ Chat:
 <button id="sendMessageBtn" onclick="sendMessage()">Send message</button>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    
+    var offerSent = false;
     var user = null;
     var user2 = null;
     var socket = null;
@@ -170,7 +170,8 @@ Chat:
             if (e.candidate) {
                 pcLocal.addIceCandidate(e.candidate);
             }
-            if (pcLocal.iceGatheringState == "complete") {
+            if (pcLocal.iceGatheringState == "complete" && !offerSent) {
+                offerSent = true;
                 sendNegotiation("offer", pcLocal.localDescription);
             }
             else {
