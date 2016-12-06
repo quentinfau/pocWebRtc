@@ -17,6 +17,7 @@ Chat:
 <script src="/socket.io/socket.io.js"></script>
 <script>
     var offerSent = false;
+    var answerSent = false;
     var user = null;
     var user2 = null;
     var socket = null;
@@ -271,7 +272,8 @@ Chat:
             if (e.candidate) {
                 pcRemote.addIceCandidate(e.candidate);
             }
-            if (pcRemote.iceGatheringState == "complete") {
+            if (pcRemote.iceGatheringState == "complete" && !answerSent) {
+                answerSent = true;
                 sendNegotiation("answer", pcRemote.localDescription);
                 //  sendNegotiation("candidate", e.candidate);
             }
