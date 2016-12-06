@@ -166,7 +166,7 @@ Chat:
        //pcLocal = new RTCPeerConnection(cfg, con);
 
         pcLocal.onicecandidate = function (e) {
-            if (e.candidate != null) {
+            if (pcLocal.iceGatheringState == "complete") {
                 sendNegotiation("offer", pcLocal.localDescription);
             }
             else {
