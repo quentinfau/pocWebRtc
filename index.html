@@ -178,11 +178,11 @@ Chat:
                 if (dc2 != null) {
                     dcList[createID(user, user2)] = dc2;
                 }
-            }
-        };
-        dc2.onmessage = function (e) {
-            var data = JSON.parse(e.data);
-            writeMsg(data);
+            };
+            dc2.onmessage = function (e) {
+                var data = JSON.parse(e.data);
+                writeMsg(data);
+            };
         };
         pcRemote.onicecandidate = function () {
             if (pcRemote.iceGatheringState == "complete" && !answerSent) {
