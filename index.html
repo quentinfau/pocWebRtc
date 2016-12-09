@@ -6,7 +6,8 @@
 <input type="text" name="user" id="user" placeholder="e.g. Alice">
 <button type="submit" id="setid">Connect to WebSocket</button>
 <input type="text" id="user2" placeholder="e.g. Bob">
-<input type="select" id="userList"/>
+<select  name="userList" id="userList">
+    </select>
 <button id="connectToRemote">Connect to remote</button>
 <br>
 Chat:
@@ -132,7 +133,7 @@ Chat:
     }
 
     function updateList(list) {
-        var x = document.getElementById("liste");
+        var x = document.getElementById("userList");
         list.forEach(function (entry) {
             var c = document.createElement("option");
             c.text = entry.id;
