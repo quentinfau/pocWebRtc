@@ -65,15 +65,6 @@ Chat:
             data.user = user;
             writeMsg(data);
         });
-        socket.on('askForId', function () {
-            pcLocalList[createID(user, user2)] = pcLocal;
-            if (dc1 != null) {
-                dcList[createID(user, user2)] = dc1;
-            }
-            if (dc2 != null) {
-                dcList[createID(user, user2)] = dc2;
-            }
-        });
         socket.on('listOfClient', function (list) {
             updateList(list);
         });
