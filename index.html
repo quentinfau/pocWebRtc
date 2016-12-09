@@ -188,6 +188,7 @@ Chat:
             console.log('Connected');
             var data = {user: "system", message: "the datachannel "+dc1.label+" has been opened"};
             writeMsg(data);
+            offerSent = false;
       //      activedc.send(JSON.stringify(data));
         }
         dc1.onmessage = function (e) {
@@ -255,6 +256,7 @@ Chat:
                 //on écrit dans le chat que le user s'est connecté
                 var data = {user: "system", message: "the datachannel "+dc2.label+" has been opened"};
                 writeMsg(data);
+                answerSent = false;
                 //on envoie dans le channel que le user s'est connecté
            //     activedc.send(JSON.stringify(data));
                 socket.emit("askForId", user2);
