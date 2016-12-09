@@ -37,7 +37,6 @@ io.sockets.on('connection', function (socket) {
         console.log('ask for list of client: ' + pseudo);
         socket.emit('listOfClient', socketList)
     });
-
     socket.on('negotiationMessage', function (data) {
         console.log('Got socket message: ' + data);
         var msg = JSON.parse(data);
