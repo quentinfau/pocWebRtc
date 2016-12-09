@@ -27,12 +27,9 @@ io.sockets.on('connection', function (socket) {
 	socket.on('nouveau_client', function(pseudo) {
 		console.log('nouveau client');
 		socket.user = pseudo;
+        updateListOfClient();
 	});
 
-	socket.on('listOfClient', function (pseudo) {
-		console.log('ask for list of client: ' + pseudo);
-		socket.emit('listOfClient', socketList)
-	});
 	socket.on('negotiationMessage', function (data) {
 		console.log('Got socket message: ' + data);
 		var msg = JSON.parse(data);
@@ -48,5 +45,15 @@ io.sockets.on('connection', function (socket) {
 	socket.on('disconnect', function (e) {
 		socketList.splice(socketList.indexOf(this),1);
 		console.log('Client disconnected')
+        updateListOfClient();
 	});
 });
+function updateListOfClient(){
+        var userList = [];
+        socketList.forEach(function (socket) {
+            userList.push(socket.user);
+        })
+        socketList.forEach(function (socket) {
+            socket.emit('listOfClient', userList);
+        })
+}
