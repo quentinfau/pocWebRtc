@@ -62,10 +62,9 @@ Chat:
     function connectToWebSocket() {
         socket = io.connect(location.origin);
 
-
-
         socket.on('welcomeMessage', function (data) {
             console.log("received message from the server : " + data.message);
+            data.user = user;
             writeMsg(data);
         });
         socket.on('askForId', function (id) {
@@ -76,121 +75,42 @@ Chat:
             if (dc2!=null){
                 dcList[createID(user,user2)] = dc2;
             }
-
-
         });
         socket.on('listOfClient', function (list) {
            updateList(list);
         });
         socket.on('negotiationMessage', function (data) {
             console.log("received message from the server : " + data);
-     //       var json = JSON.parse(data);
-
             if (data.action == "offer") {
-                // incoming offer
-                //  if(json.to == user){
                 user2 = data.from;
-                processOffer(data.data)
-                // }
+                processOffer(data.data);
             } else if (data.action == "answer") {
-                // incoming answer
                 if (data.to == user) {
                     processAnswer(data.data , data.id);
                 }
             }
         });
-
         socket.emit('nouveau_client', user);
-
-/*
-        socket.on('nouveau_client', function (pseudo) {
-            var el = document.createElement("p");
-            var txtNode = document.createTextNode(pseudo + ' vient de se connecter');
-            el.appendChild(txtNode);
-            receivebox.appendChild(el);
-        });
-*/
-
-        /*    var HOST = location.origin.replace(/^http/, 'ws')
-            ws = new WebSocket(HOST);
-            // ws = new WebSocket("ws://pocwebrtc.herokuapp.com:5001");
-            ws.onopen = function (e) {
-                console.log("Websocket opened");
-                var msg = {
-                    type: "username",
-                    data: user,
-                    test: e
-                };
-                ws.send(JSON.stringify(msg));
-            }
-            ws.onclose = function (e) {
-                console.log("Websocket closed");
-            }
-
-            ws.onmessage = function (e) {
-                console.log("Websocket message received: " + e.data);
-                var json = JSON.parse(e.data);
-
-                if (json.action == "candidate") {
-                    if (json.to == user) {
-                        processIce(json.data);
-                    }
-                } else if (json.action == "offer") {
-                    // incoming offer
-                    //  if(json.to == user){
-                    user2 = json.from;
-                    processOffer(json.data)
-                    // }
-                } else if (json.action == "answer") {
-                    // incoming answer
-                    if (json.to == user) {
-                        processAnswer(json.data);
-                    }
-                }
-                // else if(json.action == "id"){
-                //    userId = json.data;
-                // } else if(json.action=="newUser"){
-                //     if(userId!=null && json.data!=userId){
-
-                //     }
-                // }
-
-            }
-            ws.onerror = function (e) {
-                console.log("Websocket error");
-            }*/
     }
-
-
-    // BOB: create
     function connectTo() {
          pcLocal =  new RTCPeerConnection(cfg, con);
-       //pcLocal = new RTCPeerConnection(cfg, con);
-
         pcLocal.onicecandidate = function (e) {
             if (pcLocal.iceGatheringState == "complete" && !offerSent) {
                 offerSent = true;
                 sendNegotiation("offer", pcLocal.localDescription);
             }
             else {
-                /*     console.log("CONNECTED");
-                 var data = {user: "system", message: "user '" + user + "' connected"};
-                 writeMsg(data);
-                 activedc.send(JSON.stringify(data));
-                 */
+
             }
-        }
-
-
-        dc1 = pcLocal.createDataChannel(createID(user,user2), {reliable: true})
-        activedc = dc1
-        dc1.onopen = function (e) {
+        };
+        dc1 = pcLocal.createDataChannel(createID(user,user2), {reliable: true});
+        activedc = dc1;
+        dc1.onopen = function () {
             console.log('Connected');
             var data = {user: "system", message: "the datachannel "+dc1.label+" has been opened"};
             writeMsg(data);
             offerSent = false;
-      //      activedc.send(JSON.stringify(data));
-        }
+        };
         dc1.onmessage = function (e) {
 
             if (e.data.charCodeAt(0) == 2) {
@@ -198,19 +118,18 @@ Chat:
             }
             var data = JSON.parse(e.data);
             writeMsg(data);
-        }
+        };
         pcLocal.createOffer(function (desc) {
             pcLocal.setLocalDescription(desc, function () {}, function () {});
             console.log("------ SEND OFFER ------");
 
-        }, function () {}, sdpConstraints)
+        }, function () {}, sdpConstraints);
 
         pcLocalList[createID(user,user2)] = pcLocal;
         if (dc1!=null){
             dcList[createID(user,user2)] = dc1;
         }
     }
-    ;
 
     function createID(local,remote){
         return local+'-'+remote;
@@ -222,7 +141,6 @@ Chat:
         console.log("------ PROCESSED ANSWER ------");
         return true;
     }
-    ;
 
     function updateList(list) {
         var x = document.getElementById("liste");
@@ -309,8 +227,6 @@ Chat:
     if (navigator.webkitGetUserMedia) {
         RTCPeerConnection = webkitRTCPeerConnection
     }
-
-
 
     function sendMessage() {
         if (messageTextBox.value) {
